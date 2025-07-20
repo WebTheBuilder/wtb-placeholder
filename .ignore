@@ -1,0 +1,10 @@
+# .ignore
+node_modules/
+public/style.css.map
+*.log
+.DS_Store
+npm-debug.log*
+.idea/
+.vscode/
+dist/
+.env

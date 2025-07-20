@@ -1,0 +1,38 @@
+{
+  "name": "wtb-placeholder",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A configurable placeholder page server for 'coming soon', 'maintenance', or 'new account' pages using Express and EJS.",
+  "main": "server.js",
+  "scripts": {
+    "start": "npm run build:css && node server.js",
+    "dev": "concurrently \"npm:watch:css\" \"nodemon server.js\"",
+    "build:css": "sass public/style.scss public/style.css",
+    "watch:css": "sass --watch public/style.scss public/style.css",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "placeholder",
+    "coming-soon",
+    "maintenance",
+    "express",
+    "ejs",
+    "hosting"
+  ],
+  "author": "Your Name or Company <you@example.com>",
+  "license": "ISC",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "nodemon": "^3.1.10",
+    "sass": "^1.89.2"
+  }
+}
