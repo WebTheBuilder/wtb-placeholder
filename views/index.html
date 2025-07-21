@@ -60,19 +60,23 @@
     </main>
 
     <footer>
-        <% if (showSocial && Object.keys(socialLinks).length > 0) { %>
+        <% if (showSocial) { %>
         <div class="social-links">
-            <% if (socialLinks.facebook && socialLinks.facebook !== '#') { %>
-            <a href="<%= socialLinks.facebook %>" target="_blank">Facebook</a>
+            <%
+            // A map to make the link text more presentable
+            const socialDisplayNames = {
+            facebook: 'Facebook',
+            twitter: 'Twitter',
+            linkedin: 'LinkedIn',
+            instagram: 'Instagram'
+            };
+            %>
+            <% for (const platform in socialLinks) { %>
+            <% if (socialLinks[platform] && socialLinks[platform] !== '#') { %>
+            <a href="<%= socialLinks[platform] %>" target="_blank" rel="noopener noreferrer">
+                <%= socialDisplayNames[platform] || platform %>
+            </a>
             <% } %>
-            <% if (socialLinks.twitter && socialLinks.twitter !== '#') { %>
-            <a href="<%= socialLinks.twitter %>" target="_blank">Twitter</a>
-            <% } %>
-            <% if (socialLinks.linkedin && socialLinks.linkedin !== '#') { %>
-            <a href="<%= socialLinks.linkedin %>" target="_blank">LinkedIn</a>
-            <% } %>
-            <% if (socialLinks.instagram && socialLinks.instagram !== '#') { %>
-            <a href="<%= socialLinks.instagram %>" target="_blank">Instagram</a>
             <% } %>
         </div>
         <% } %>

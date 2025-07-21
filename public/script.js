@@ -1,53 +1,93 @@
+// E:/wtb-placeholder/public/script.js
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- Countdown Timer ---
     const countdownContainer = document.querySelector('.countdown-container');
     if (countdownContainer) {
-        const countdownDate = countdownContainer.dataset.countdownDate;
-        const targetDate = new Date(countdownDate).getTime();
+        const countdownDateStr = countdownContainer.dataset.countdownDate;
 
-        const x = setInterval(function() {
-            const now = new Date().getTime();
-            const distance = targetDate - now;
+        // 1. Ensure the date string exists before trying to use it.
+        if (countdownDateStr) {
+            const targetDate = new Date(countdownDateStr).getTime();
 
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            // 2. Check if the parsed date is a valid number.
+            if (!isNaN(targetDate)) {
+                const countdownInterval = setInterval(() => {
+                    const now = new Date().getTime();
+                    const distance = targetDate - now;
 
-            document.getElementById("days").innerHTML = String(days).padStart(2, '0');
-            document.getElementById("hours").innerHTML = String(hours).padStart(2, '0');
-            document.getElementById("minutes").innerHTML = String(minutes).padStart(2, '0');
-            document.getElementById("seconds").innerHTML = String(seconds).padStart(2, '0');
+                    // 3. If the countdown is finished, clear the interval and update the UI.
+                    if (distance < 0) {
+                        clearInterval(countdownInterval);
+                        countdownContainer.innerHTML = "<div class='countdown-item'>LAUNCHED!</div>";
+                        return; // Stop further execution
+                    }
 
-            if (distance < 0) {
-                clearInterval(x);
-                countdownContainer.innerHTML = "LAUNCHED!"; // Or hide, or change message
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    // Use textContent for better performance and security when only updating text.
+                    document.getElementById("days").textContent = String(days).padStart(2, '0');
+                    document.getElementById("hours").textContent = String(hours).padStart(2, '0');
+                    document.getElementById("minutes").textContent = String(minutes).padStart(2, '0');
+                    document.getElementById("seconds").textContent = String(seconds).padStart(2, '0');
+                }, 1000);
+            } else {
+                // 4. If the date is invalid, hide the countdown to prevent showing errors.
+                console.error("Invalid countdown date provided:", countdownDateStr);
+                countdownContainer.style.display = 'none';
             }
-        }, 1000);
+        }
     }
 
-    // --- Email Signup Form (Client-Side Only) ---
+    // --- Email Signup Form ---
     const signupForm = document.getElementById('signup-form');
-    const signupMessage = document.getElementById('signup-message');
-    const emailInput = document.getElementById('email-input');
-
     if (signupForm) {
-        signupForm.addEventListener('submit', (event) => {
-            event.preventDefault(); // Prevent default form submission
+        const signupMessage = document.getElementById('signup-message');
+        const emailInput = document.getElementById('email-input');
+        const submitButton = signupForm.querySelector('button');
 
+        signupForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
             const email = emailInput.value;
 
-            // In a real application, you would send this email to your backend server
-            // using fetch() or XMLHttpRequest. For this template, we'll just simulate success.
-            console.log(`Email submitted: ${email}`);
+            // Disable the form while submitting
+            submitButton.disabled = true;
+            submitButton.textContent = 'Submitting...';
 
-            signupMessage.textContent = 'Thank you for signing up! We\'ll keep you updated.';
-            signupMessage.classList.remove('hidden');
-            emailInput.value = ''; // Clear the input field
-            signupForm.reset(); // Also resets the form state if needed
+            try {
+                // Send the email to a new /signup endpoint on your server
+                const response = await fetch('/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email: email }),
+                });
 
-            // Optionally hide the form after successful submission
-            // signupForm.style.display = 'none';
+                const result = await response.json();
+
+                if (!response.ok) {
+                    // Handle errors from the server (e.g., invalid email)
+                    throw new Error(result.message || 'Something went wrong.');
+                }
+
+                // Show success message from the server
+                signupMessage.textContent = result.message;
+                signupForm.reset();
+
+            } catch (error) {
+                // Show any error messages to the user
+                signupMessage.textContent = error.message;
+                console.error('Signup failed:', error);
+            } finally {
+                // Re-enable the form
+                signupMessage.classList.remove('hidden');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Notify Me';
+            }
         });
     }
 });
